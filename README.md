@@ -18,7 +18,6 @@ This project demonstrates clean service design, transactional integrity, and API
 - **Spring Boot 3**
 - **Spring Data JPA (Hibernate)**
 - **Springdoc OpenAPI (Swagger)**
-- **An IDE (IntelliJ, VS Code, etc.)**
 - **Maven**
 
 ---
@@ -55,7 +54,7 @@ Make sure you have the following installed:
 
 - **Java 17+**
 - **Maven**
-- **Intelli j**
+- **An IDE (IntelliJ, VS Code, etc.)**
 - **Git**
 
 ---
