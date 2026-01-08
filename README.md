@@ -206,6 +206,8 @@ curl.exe -X POST http://localhost:8080/api/wallets/transfer/1 ^
   "type": "TRANSFER",
   "status": "SUCCESS",
   "walletId": 1,
+  "from": "joy",
+  "to": "jane",
   "receiverWalletId": 2,
   "idempotencyKey": "transfer-1",
   "createdAt": "2026-01-08T19:15:00"
