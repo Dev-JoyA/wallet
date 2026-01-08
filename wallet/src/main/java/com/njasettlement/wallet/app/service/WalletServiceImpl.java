@@ -8,8 +8,6 @@ import com.njasettlement.wallet.app.model.*;
 import com.njasettlement.wallet.app.repository.IdempotencyKeyRepository;
 import com.njasettlement.wallet.app.repository.WalletRepository;
 import com.njasettlement.wallet.app.repository.WalletTransactionsRepository;
-import com.njasettlement.wallet.middleware.exception.error.TransactionsException;
-import com.njasettlement.wallet.middleware.exception.error.WalletException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +31,7 @@ public class WalletServiceImpl implements WalletService{
     public WalletResponseDto createWallet(WalletRequestDto request) {
         Optional<Wallet> existingWallet = walletRepository.findByUserName(request.getUserName());
         if (existingWallet.isPresent()) {
-            throw new WalletException("User already exists");
+            throw new RuntimeException("User already exists");
         }
 
         Wallet wallet = new Wallet();
@@ -47,7 +45,7 @@ public class WalletServiceImpl implements WalletService{
         }
 
         if (request.getUserName() == null || request.getUserName().isBlank()) {
-            throw new WalletException("Username is required");
+            throw new RuntimeException("Username is required");
         }
         wallet.setUserName(request.getUserName());
 
@@ -72,11 +70,11 @@ public class WalletServiceImpl implements WalletService{
     @Transactional
     public TransactionResponseDto updateBalance(Long walletId, TransactionRequestDto request) {
         Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new WalletException("No wallet found with id: " + walletId));
+                .orElseThrow(() -> new RuntimeException("No wallet found with id: " + walletId));
 
         Long amount = request.getAmount();
         if (amount == null || amount <= 0) {
-            throw new TransactionsException("Amount must be greater than 0");
+            throw new RuntimeException("Amount must be greater than 0");
         }
 
         String idempotencyKeyValue = request.getIdempotencyKey();
@@ -104,7 +102,7 @@ public class WalletServiceImpl implements WalletService{
         if (request.getType() == TransactionType.DEBIT) {
             if (amount > wallet.getBalance()) {
                 transaction.setStatus(TransactionStatus.FAILED);
-                throw new TransactionsException("Insufficient funds");
+                throw new RuntimeException("Insufficient funds");
             }
             wallet.setBalance(wallet.getBalance() - amount);
         } else if (request.getType() == TransactionType.CREDIT) {
@@ -129,20 +127,26 @@ public class WalletServiceImpl implements WalletService{
 
     @Override
     @Transactional
-    public TransactionResponseDto transferFunds(Long walletId, TransactionRequestDto request){
-        Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new WalletException("No wallet found with id: " + walletId));
+    public TransactionResponseDto transferFunds(Long walletId, TransactionRequestDto request) {
+        Wallet sender = walletRepository.findById(walletId)
+                .orElseThrow(() -> new RuntimeException("No wallet found with id: " + walletId));
+
+        Wallet receiver = walletRepository.findById(request.getReceiverWalletId())
+                .orElseThrow(() -> new RuntimeException("No receiver with ID: " + request.getReceiverWalletId()));
+
+        if (sender.getId().equals(receiver.getId())) {
+            throw new RuntimeException("Cannot transfer to the same wallet");
+        }
 
         Long amount = request.getAmount();
         if (amount == null || amount <= 0) {
-            throw new TransactionsException("Amount must be greater than 0");
+            throw new RuntimeException("Amount must be greater than 0");
         }
 
         String idempotencyKeyValue = request.getIdempotencyKey();
         if (idempotencyKeyValue != null && !idempotencyKeyValue.isBlank()) {
             Optional<IdempotencyKey> existingKey = idempotencyRepository.findByIkeyAndWallet_Id(
                     idempotencyKeyValue, walletId);
-
             if (existingKey.isPresent()) {
                 WalletTransaction existingTransaction = existingKey.get().getTransaction();
                 return buildTransactionResponse(existingTransaction, existingKey.get().getIkey());
@@ -151,34 +155,28 @@ public class WalletServiceImpl implements WalletService{
             idempotencyKeyValue = UUID.randomUUID().toString();
         }
 
-        Wallet receiverWallet = walletRepository.findById(request.getReceiverWalletId())
-                .orElseThrow(() -> new TransactionsException("No receiver with ID: " + request.getReceiverWalletId()));
-
-        WalletTransaction transaction = new WalletTransaction();
-        transaction.setWallet(wallet);
-        transaction.setAmount(amount);
-        transaction.setReceiverWalletId(receiverWallet.getId());
-        transaction.setType(request.getType());
-        transaction.setStatus(TransactionStatus.PENDING);
-
-
-
-        if (request.getType() == TransactionType.DEBIT) {
-            throw new UnsupportedOperationException("Wrong endpoint ");
-        } else if (request.getType() == TransactionType.CREDIT) {
-            throw new UnsupportedOperationException("Wrong endpoint");
-        } else if (request.getType() == TransactionType.TRANSFER) {
-            wallet.setBalance(wallet.getBalance() - amount);
-            receiverWallet.setBalance(receiverWallet.getBalance() + amount);
+        if (amount > sender.getBalance()) {
+            throw new RuntimeException("Insufficient funds");
         }
 
-        walletRepository.save(wallet);
-        walletRepository.save(receiverWallet);
+        WalletTransaction transaction = new WalletTransaction();
+        transaction.setWallet(sender);
+        transaction.setReceiverWalletId(receiver.getId());
+        transaction.setAmount(amount);
+        transaction.setType(TransactionType.TRANSFER);
+        transaction.setStatus(TransactionStatus.PENDING);
+
+        sender.setBalance(sender.getBalance() - amount);
+        receiver.setBalance(receiver.getBalance() + amount);
+
+        walletRepository.save(sender);
+        walletRepository.save(receiver);
+
         transaction.setStatus(TransactionStatus.SUCCESS);
         WalletTransaction savedTransaction = transactionsRepository.save(transaction);
 
         IdempotencyKey key = new IdempotencyKey();
-        key.setWallet(wallet);
+        key.setWallet(sender);
         key.setTransaction(savedTransaction);
         key.setIkey(idempotencyKeyValue);
         idempotencyRepository.save(key);
@@ -186,10 +184,11 @@ public class WalletServiceImpl implements WalletService{
         return buildTransactionResponse(savedTransaction, idempotencyKeyValue);
     }
 
+
     @Override
     public WalletResponseDto getOneWallet (Long walletId){
         Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new WalletException("No wallet found with id: " + walletId));
+                .orElseThrow(() -> new RuntimeException("No wallet found with id: " + walletId));
         WalletResponseDto response = new WalletResponseDto();
         response.setId(wallet.getId());
         response.setBalance(wallet.getBalance());
@@ -213,7 +212,7 @@ public class WalletServiceImpl implements WalletService{
             dto.setTo(transaction.getWallet().getFirstName());
         }else{
             Wallet wallet = walletRepository.findById(transaction.getReceiverWalletId())
-                    .orElseThrow(() -> new TransactionsException("not found"));
+                    .orElseThrow(() -> new RuntimeException("not found"));
             dto.setTo(wallet.getFirstName());
         }
         dto.setFrom(transaction.getWallet().getFirstName());
