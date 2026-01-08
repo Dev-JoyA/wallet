@@ -1,15 +1,11 @@
-package com.njasettlement.wallet.model;
+package com.njasettlement.wallet.app.model;
 
-import com.njasettlement.wallet.model.TransactionType;
-import com.njasettlement.wallet.model.Wallet;
 import jakarta.persistence.*;
-import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -39,6 +35,8 @@ public class WalletTransaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
+
+    private Long receiverWalletId;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

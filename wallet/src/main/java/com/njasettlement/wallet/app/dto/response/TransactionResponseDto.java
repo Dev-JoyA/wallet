@@ -1,7 +1,7 @@
-package com.njasettlement.wallet.dto.response;
+package com.njasettlement.wallet.app.dto.response;
 
-import com.njasettlement.wallet.model.TransactionStatus;
-import com.njasettlement.wallet.model.TransactionType;
+import com.njasettlement.wallet.app.model.TransactionStatus;
+import com.njasettlement.wallet.app.model.TransactionType;
 import lombok.Getter;
 import lombok.Setter;
 

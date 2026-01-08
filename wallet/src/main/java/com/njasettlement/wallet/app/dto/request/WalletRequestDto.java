@@ -1,4 +1,4 @@
-package com.njasettlement.wallet.dto.request;
+package com.njasettlement.wallet.app.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,5 +8,5 @@ import lombok.Setter;
 public class WalletRequestDto {
     private String firstName;
     private String lastName;
-    private String deposit;
+    private String userName;
 }
