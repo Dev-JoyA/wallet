@@ -122,10 +122,18 @@ You can test the Wallet API endpoints directly using **cURL** from Windows Power
 **Endpoint:** `POST /api/wallets/create`  
 **Description:** Creates a new wallet with a unique username.
 
+Windows
+
 ```bash
 curl.exe -X POST http://localhost:8080/api/wallets/create ^
 -H "Content-Type: application/json" ^
 -d "{ \"firstName\": \"Alice\", \"lastName\": \"Johnson\", \"userName\": \"wallet1\" }"
+```
+macOS/Linux (zsh/bash)
+```bash
+curl -X POST http://localhost:8080/api/wallets/create \
+-H "Content-Type: application/json" \
+-d '{ "firstName": "Alice", "lastName": "Johnson", "userName": "wallet1" }'
 ```
 
 expected Response
@@ -145,10 +153,19 @@ expected Response
 
 **Endpoint:** `POST /api/wallets/{walletId}/balance`
 **Description:** Adds funds to a wallet. Requires an idempotencyKey to prevent duplicate transactions.
+
+Windows
 ```bash
 curl.exe -X POST http://localhost:8080/api/wallets/1/balance ^
 -H "Content-Type: application/json" ^
 -d "{ \"type\": \"CREDIT\", \"amount\": 5000, \"idempotencyKey\": \"credit-1\" }"
+```
+
+macOS/Linux
+```bash
+curl -X POST http://localhost:8080/api/wallets/1/balance \
+-H "Content-Type: application/json" \
+-d '{ "type": "CREDIT", "amount": 5000, "idempotencyKey": "credit-1" }'
 ```
 
 **Expected Response**
@@ -168,12 +185,19 @@ curl.exe -X POST http://localhost:8080/api/wallets/1/balance ^
 
 **Endpoint:** `POST /api/wallets/{walletId}/balance`
 **Description:** Deducts funds from a wallet, ensuring sufficient balance.
+
+Windows
 ```bash
 curl.exe -X POST http://localhost:8080/api/wallets/1/balance ^
 -H "Content-Type: application/json" ^
 -d "{ \"type\": \"DEBIT\", \"amount\": 2000, \"idempotencyKey\": \"debit-1\" }"
 ```
-
+macOS/Linux
+```bash
+curl -X POST http://localhost:8080/api/wallets/1/balance \
+-H "Content-Type: application/json" \
+-d '{ "type": "DEBIT", "amount": 2000, "idempotencyKey": "debit-1" }'
+```
 
 **Expected Response: **
 ```json
@@ -192,10 +216,18 @@ curl.exe -X POST http://localhost:8080/api/wallets/1/balance ^
 
 **Endpoint:** `POST /api/wallets/transfer/{walletId}`
 **Description:** Transfers funds from one wallet to another atomically. Requires the sender wallet ID in the URL.
+Windows
 ```bash
 curl.exe -X POST http://localhost:8080/api/wallets/transfer/1 ^
 -H "Content-Type: application/json" ^
 -d "{ \"type\": \"TRANSFER\", \"amount\": 1000, \"receiverWalletId\": 2, \"idempotencyKey\": \"transfer-1\" }"
+```
+macOS/Linux
+```bash
+curl -X POST http://localhost:8080/api/wallets/transfer/1 \
+-H "Content-Type: application/json" \
+-d '{ "type": "TRANSFER", "amount": 1000, "receiverWalletId": 2, "idempotencyKey": "transfer-1" }'
+
 ```
 
 **Expected Response:**
@@ -217,8 +249,13 @@ curl.exe -X POST http://localhost:8080/api/wallets/transfer/1 ^
 
 **Endpoint:** `GET /api/wallets/one/{walletId}`
 **Description:** Retrieves the current balance and details of a wallet.
+Windows
 ```bash
 curl.exe http://localhost:8080/api/wallets/one/1
+```
+macOS/Linux
+```bash
+curl http://localhost:8080/api/wallets/one/1
 ```
 
 **Expected Response**
