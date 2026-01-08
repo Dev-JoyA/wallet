@@ -63,7 +63,8 @@ Make sure you have the following installed:
 
 ```bash
 git clone https://github.com/Dev-JoyA/wallet.git
-cd wallet
+cd wallet/wallet
+
 ```
 
 Run the Application
