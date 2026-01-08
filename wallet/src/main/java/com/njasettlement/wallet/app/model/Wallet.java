@@ -1,4 +1,4 @@
-package com.njasettlement.wallet.model;
+package com.njasettlement.wallet.app.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,11 +24,11 @@ public class Wallet {
     @Column(nullable = false)
     private Long balance = 0L;
 
-    private Long deposit;
-
     private String firstName;
 
     private String lastName;
+
+    private String userName;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

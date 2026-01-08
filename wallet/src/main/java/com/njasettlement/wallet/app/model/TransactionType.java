@@ -1,4 +1,4 @@
-package com.njasettlement.wallet.model;
+package com.njasettlement.wallet.app.model;
 
 public enum TransactionType {
     DEBIT,

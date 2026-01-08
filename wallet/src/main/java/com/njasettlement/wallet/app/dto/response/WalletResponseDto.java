@@ -1,4 +1,4 @@
-package com.njasettlement.wallet.dto.response;
+package com.njasettlement.wallet.app.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +12,7 @@ public class WalletResponseDto {
     private Long balance;
     private String firstName;
     private String lastName;
+    private String userName;
     private LocalDateTime createdAt;
 }
 

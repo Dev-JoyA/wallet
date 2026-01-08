@@ -1,9 +1,9 @@
-package com.njasettlement.wallet.service;
+package com.njasettlement.wallet.app.service;
 
-import com.njasettlement.wallet.dto.request.TransactionRequestDto;
-import com.njasettlement.wallet.dto.request.WalletRequestDto;
-import com.njasettlement.wallet.dto.response.TransactionResponseDto;
-import com.njasettlement.wallet.dto.response.WalletResponseDto;
+import com.njasettlement.wallet.app.dto.request.TransactionRequestDto;
+import com.njasettlement.wallet.app.dto.request.WalletRequestDto;
+import com.njasettlement.wallet.app.dto.response.TransactionResponseDto;
+import com.njasettlement.wallet.app.dto.response.WalletResponseDto;
 
 public interface WalletService {
     WalletResponseDto createWallet (WalletRequestDto request);
