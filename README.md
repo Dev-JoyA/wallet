@@ -270,11 +270,6 @@ curl http://localhost:8080/api/wallets/one/1
 }
 ```
 ---
-### ✅ Notes
-
-- On Linux/macOS, remove `curl.exe` and `^` line continuations.  
-- `idempotencyKey` ensures that retrying the same request does not create duplicate transactions.  
-- These examples assume your application is running locally on **port 8080**. Adjust the URL if different.
 
 
 
