@@ -29,7 +29,6 @@ This project demonstrates clean service design, transactional integrity, and API
 - Credit and debit wallet balances
 - Transfer funds between wallets atomically
 - Idempotency support to prevent duplicate transactions
-- Centralized error handling
 - API documentation via Swagger UI
 
 ---
